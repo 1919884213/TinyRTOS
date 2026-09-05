@@ -18,7 +18,7 @@
   ],
   "description": "基于 STM32F407VGT6 的手写实时操作系统内核：Cortex-M4 PendSV/SVC 上下文切换、O(1) 位图调度器、互斥量/信号量/消息队列，附带 CubeMX HAL 工程与优先级反转演示应用。",
   "analyzedAt": "2026-09-05T01:15:17.984372+00:00",
-  "gitCommitHash": "a5bcb01dcded776131285994919c51acae067330"
+  "gitCommitHash": "e2b18d402bde7e40cdaf30b67fdfdf07e72b02de"
  },
  "nodes": [
   {
