@@ -73,7 +73,7 @@ void os_schedule(void) {
   current_tcb = ready_head[highest_prio()];
 }
 
-/* 静态任务栈：每任务 1KB，编译期分配，不用 malloc（无碎片、确定性） */
+/* 静态任务栈：每任务 2KB（STACK_SIZE），编译期分配，不用 malloc（无碎片、确定性） */
 static uint32_t task_stacks[MAX_TASKS][STACK_SIZE / sizeof(uint32_t)];
 /*伪造现场*/
 /* 栈初始化：构造 16 字首帧，伪装成"刚被 PendSV 中断过"。
