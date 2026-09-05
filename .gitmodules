@@ -1,3 +1,0 @@
-[submodule "Core/User/rtos"]
-	path = Core/User/rtos
-	url = https://github.com/1919884213/TinyRTos.git
