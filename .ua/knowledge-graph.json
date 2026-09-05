@@ -1,0 +1,1428 @@
+{
+ "version": "1.0.0",
+ "project": {
+  "name": "TinyRTOS (STM32F407VGT6)",
+  "languages": [
+   "c",
+   "cmake",
+   "markdown",
+   "assembly",
+   "json",
+   "linker_script",
+   "ini"
+  ],
+  "frameworks": [
+   "STM32 HAL",
+   "STM32CubeMX",
+   "FreeRTOS-style RTOS (hand-written)"
+  ],
+  "description": "基于 STM32F407VGT6 的手写实时操作系统内核：Cortex-M4 PendSV/SVC 上下文切换、O(1) 位图调度器、互斥量/信号量/消息队列，附带 CubeMX HAL 工程与优先级反转演示应用。",
+  "analyzedAt": "2026-09-05T01:15:17.984372+00:00",
+  "gitCommitHash": "no-git"
+ },
+ "nodes": [
+  {
+   "id": "config:.settings/bundles-lock.store.json",
+   "type": "config",
+   "name": "bundles-lock.store.json",
+   "filePath": ".settings/bundles-lock.store.json",
+   "summary": "STM32 VS Code 扩展的工具链锁定文件，记录已解析的工具包依赖：cmake 4.3.1、ninja 1.13.2、gnu-tools-for-stm32 14.3.1（ARM GCC 交叉编译器）、st-arm-clangd 21.1.0、programmer 2.23.0、stlink-gdbserver 7.14.0，并为每种工具列出 darwin/linux/windows 多平台条目及选中来源，用于保证构建环境可复现。",
+   "tags": [
+    "STM32CubeCLT",
+    "工具链锁定",
+    "CMake",
+    "Ninja",
+    "GCC",
+    "GDB Server",
+    "可复现构建"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:.settings/bundles.store.json",
+   "type": "config",
+   "name": "bundles.store.json",
+   "filePath": ".settings/bundles.store.json",
+   "summary": "STM32 VS Code 扩展的工具包清单，声明项目所依赖的 6 个工具及其版本：cmake、ninja、gnu-tools-for-stm32（ARM GCC 编译器）、st-arm-clangd（语言服务器）、programmer（烧录工具）、stlink-gdbserver（调试服务器）。bundles-lock.store.json 是其解析后的锁定版本。",
+   "tags": [
+    "STM32CubeCLT",
+    "工具链",
+    "依赖声明",
+    "CMake",
+    "烧录",
+    "调试"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:.settings/ide.store.json",
+   "type": "config",
+   "name": "ide.store.json",
+   "filePath": ".settings/ide.store.json",
+   "summary": "STM32 VS Code 扩展的 IDE 元数据：标记项目来源为 STM32CubeMX，目标器件为 STM32F407VGT6（Cortex-M4 内核），工具链为 GCC，用于扩展识别项目类型并选择相应的构建与调试配置。",
+   "tags": [
+    "STM32CubeMX",
+    "IDE 元数据",
+    "STM32F407VGT6",
+    "Cortex-M4",
+    "GCC"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:.clangd",
+   "type": "config",
+   "name": ".clangd",
+   "filePath": ".clangd",
+   "summary": "clangd 语言服务器配置，指向 compile_commands.json，为 C/C++ 代码提供智能索引与诊断",
+   "tags": [
+    "配置",
+    "cpp"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:.mxproject",
+   "type": "config",
+   "name": ".mxproject",
+   "filePath": ".mxproject",
+   "summary": "STM32CubeMX 生成的工程元数据，记录 HAL 驱动版本、源文件与包含路径清单，供重新生成代码时使用",
+   "tags": [
+    "配置",
+    "ini"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:.ua/.understandignore",
+   "type": "config",
+   "name": ".understandignore",
+   "filePath": ".ua/.understandignore",
+   "summary": "understand-anything 分析工具的忽略规则文件，定义扫描知识图谱时排除的目录与文件模式",
+   "tags": [
+    "配置",
+    "ignore"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:CMakeLists.txt",
+   "type": "config",
+   "name": "CMakeLists.txt",
+   "filePath": "CMakeLists.txt",
+   "summary": "顶层 CMake 构建脚本：定义 TinyRTOS 可执行目标，加入 RTOS 内核与用户源文件（kernel.c/mutex.c/queue.c/sem.c/switch.s/main_demo.c），设置 Core/User 包含路径，并通过 MUTEX_INHERIT 宏开关互斥量优先级继承特性",
+   "tags": [
+    "构建",
+    "cmake"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "config:CMakePresets.json",
+   "type": "config",
+   "name": "CMakePresets.json",
+   "filePath": "CMakePresets.json",
+   "summary": "CMake 预设配置：default 预设使用 Ninja 生成器与 gcc-arm-none-eabi 交叉编译工具链，派生 Debug/Release 构建/配置预设",
+   "tags": [
+    "配置",
+    "json"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:Core/Inc/gpio.h",
+   "type": "file",
+   "name": "gpio.h",
+   "filePath": "Core/Inc/gpio.h",
+   "summary": "GPIO 初始化头文件（CubeMX 生成），导出 MX_GPIO_Init() 声明",
+   "tags": [
+    "硬件外设",
+    "c_header"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:Core/Inc/main.h",
+   "type": "file",
+   "name": "main.h",
+   "filePath": "Core/Inc/main.h",
+   "summary": "应用公共头文件（CubeMX 生成），定义 Key_Pin/Key_GPIO_Port 引脚宏，声明 Error_Handler 与 main.c 各外设初始化入口",
+   "tags": [
+    "硬件外设",
+    "c_header"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:Core/Inc/stm32f4xx_hal_conf.h",
+   "type": "file",
+   "name": "stm32f4xx_hal_conf.h",
+   "filePath": "Core/Inc/stm32f4xx_hal_conf.h",
+   "summary": "HAL 库配置头文件（CubeMX 生成）：通过 USE_HAL_XXX_MODULE 宏启用/禁用各 HAL 模块（RCC/GPIO/UART/TIM 等），设置 HSE 值、SysTick 时基优先级等全局参数",
+   "tags": [
+    "HAL配置",
+    "c_header"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:Core/Inc/stm32f4xx_it.h",
+   "type": "file",
+   "name": "stm32f4xx_it.h",
+   "filePath": "Core/Inc/stm32f4xx_it.h",
+   "summary": "中断服务函数声明头文件（CubeMX 生成），声明 Cortex-M4 系统异常（NMI/HardFault/SVC_Handler/PendSV_Handler/SysTick_Handler）与外设中断（TIM6_DAC_IRQHandler）处理函数",
+   "tags": [
+    "中断",
+    "c_header"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:Core/Inc/usart.h",
+   "type": "file",
+   "name": "usart.h",
+   "filePath": "Core/Inc/usart.h",
+   "summary": "USART1 驱动头文件（CubeMX 生成），导出 huart1 句柄与 MX_USART1_UART_Init() 声明，为 printf 串口输出提供接口",
+   "tags": [
+    "串口",
+    "c_header"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:Core/Src/gpio.c",
+   "type": "file",
+   "name": "gpio.c",
+   "filePath": "Core/Src/gpio.c",
+   "summary": "GPIO 外设初始化（CubeMX 生成）：MX_GPIO_Init 使能 GPIOA/GPIOB 时钟，配置 Key 引脚（PB8）为下拉输入模式",
+   "tags": [
+    "硬件外设",
+    "c"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:Core/Src/main.c",
+   "type": "file",
+   "name": "main.c",
+   "filePath": "Core/Src/main.c",
+   "summary": "程序入口（CubeMX 生成 + 用户代码）：main() 依次执行 HAL_Init、SystemClock_Config（HSI+PLL 到 168MHz）、MX_GPIO_Init、MX_USART1_UART_Init，然后调用 app_init() 创建演示任务并以 os_start() 启动 RTOS 内核；用户区实现 __io_putchar，将 printf 重定向到 USART1",
+   "tags": [
+    "入口",
+    "c"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:Core/Src/stm32f4xx_hal_msp.c",
+   "type": "file",
+   "name": "stm32f4xx_hal_msp.c",
+   "filePath": "Core/Src/stm32f4xx_hal_msp.c",
+   "summary": "HAL MSP 初始化（CubeMX 生成）：HAL_MspInit 配置 NVIC 分组与 SysTick；HAL_MspPostInit/外设级 MSP 完成底层时钟与引脚配置，被外设初始化回调",
+   "tags": [
+    "HAL配置",
+    "c"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:Core/Src/stm32f4xx_hal_timebase_tim.c",
+   "type": "file",
+   "name": "stm32f4xx_hal_timebase_tim.c",
+   "filePath": "Core/Src/stm32f4xx_hal_timebase_tim.c",
+   "summary": "HAL 时基实现（CubeMX 生成）：用 TIM6 替代 SysTick 为 HAL 提供全局 uwTick 计数，实现 HAL_InitTick/HAL_SuspendTick/HAL_GetTick 等，TIM6 1ms 中断经 TIM6_DAC_IRQHandler 进入 HAL_TIM_IRQHandler",
+   "tags": [
+    "HAL配置",
+    "c"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:Core/Src/stm32f4xx_it.c",
+   "type": "file",
+   "name": "stm32f4xx_it.c",
+   "filePath": "Core/Src/stm32f4xx_it.c",
+   "summary": "中断服务程序文件（CubeMX 生成）：实现 NMI/HardFault/MemManage/BusFault/UsageFault/DebugMon 等 Cortex-M 异常处理，以及 TIM6_DAC_IRQHandler 转发到 HAL_TIM_IRQHandler；SVC/PendSV/SysTick 的强符号实现在内核侧（switch.s 与 kernel.c），此处仅保留声明",
+   "tags": [
+    "中断",
+    "c"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:Core/Src/syscalls.c",
+   "type": "file",
+   "name": "syscalls.c",
+   "filePath": "Core/Src/syscalls.c",
+   "summary": "newlib 系统调用桩（CubeMX 生成）：实现 _write/_read/_close/_fstat/_lseek/_isatty 等弱符号，_write 将输出导向 __io_putchar，与 main.c 配合完成 printf → USART1 的重定向",
+   "tags": [
+    "工具链",
+    "c"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:Core/Src/sysmem.c",
+   "type": "file",
+   "name": "sysmem.c",
+   "filePath": "Core/Src/sysmem.c",
+   "summary": "newlib 堆内存桩（CubeMX 生成）：实现 _sbrk，在链接脚本定义的 heap 区间上提供 malloc 所需的堆管理",
+   "tags": [
+    "工具链",
+    "c"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:Core/Src/system_stm32f4xx.c",
+   "type": "file",
+   "name": "system_stm32f4xx.c",
+   "filePath": "Core/Src/system_stm32f4xx.c",
+   "summary": "系统初始化文件（ST 官方）：定义 SystemCoreClock=168MHz，SystemInit() 由启动文件在进入 main 前调用，完成 FPU 使能、向量表重定位与时钟变量初始化，另有 SystemCoreClockUpdate",
+   "tags": [
+    "系统启动",
+    "c"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:Core/Src/usart.c",
+   "type": "file",
+   "name": "usart.c",
+   "filePath": "Core/Src/usart.c",
+   "summary": "USART1 驱动（CubeMX 生成）：MX_USART1_UART_Init 以 115200-8N1 初始化 huart1 并调用 HAL_UART_Init；HAL_UART_MspInit 使能 USART1/GPIOA 时钟并配置 PA9/PA10 复用推挽引脚，HAL_UART_MspDeInit 反初始化",
+   "tags": [
+    "串口",
+    "c"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:Core/User/app/main_demo.c",
+   "type": "file",
+   "name": "main_demo.c",
+   "filePath": "Core/User/app/main_demo.c",
+   "summary": "RTOS 演示应用：实现经典优先级反转场景——taskL(低)持锁占用共享资源、taskM(中)抢占 CPU、taskH(高)抢锁；在 MUTEX_INHERIT 开启时演示优先级继承如何消除反转；app_init() 初始化互斥量并创建 taskL/taskM/taskH/idle 四个任务",
+   "tags": [
+    "演示",
+    "c"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:Core/User/app/main_demo.h",
+   "type": "file",
+   "name": "main_demo.h",
+   "filePath": "Core/User/app/main_demo.h",
+   "summary": "演示应用头文件：声明 app_init() 入口，聚合 kernel.h/port.h/main.h 包含",
+   "tags": [
+    "应用",
+    "c_header"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:Core/User/rtos/kernel.c",
+   "type": "file",
+   "name": "kernel.c",
+   "filePath": "Core/User/rtos/kernel.c",
+   "summary": "TinyRTOS 内核核心：位图+链表实现的 O(1) 就绪队列、os_schedule 调度器、task_create 静态栈任务创建（伪造 16 字首帧）、task_delay 阻塞延时、prio_change 优先级变更（优先级继承用）、os_tick 时基（1ms 倒计时唤醒+时间片轮转+抢占判断）、os_start 配置 PendSV/SVC/SysTick 优先级并以 SVC 0 启动首个任务，SysTick_Handler 强符号调用 os_tick",
+   "tags": [
+    "RTOS内核",
+    "c"
+   ],
+   "complexity": "complex"
+  },
+  {
+   "id": "file:Core/User/rtos/kernel.h",
+   "type": "file",
+   "name": "kernel.h",
+   "filePath": "Core/User/rtos/kernel.h",
+   "summary": "内核对外接口头文件：声明 task_create/task_delay/os_yield/os_start/os_schedule/os_tick/ready_insert/ready_remove/prio_change/highest_prio，包含 tcb.h 定义任务类型",
+   "tags": [
+    "RTOS内核",
+    "c_header"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:Core/User/rtos/mutex.c",
+   "type": "file",
+   "name": "mutex.c",
+   "filePath": "Core/User/rtos/mutex.c",
+   "summary": "互斥量实现：mutex_take/mutex_give P/V 操作，支持递归嵌套计数、等待队列、锁直接交接，并在 MUTEX_INHERIT 宏开启时实现优先级继承——把高优先级等待者临时提升持有者（prio_change）以消除优先级反转",
+   "tags": [
+    "RTOS内核",
+    "c"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:Core/User/rtos/mutex.h",
+   "type": "file",
+   "name": "mutex.h",
+   "filePath": "Core/User/rtos/mutex.h",
+   "summary": "互斥量头文件：定义 mutex_t 结构（owner 持有者、nest 递归计数、prio 继承记录、wait_head 等待队列）及 mutex_init/mutex_take/mutex_give 接口",
+   "tags": [
+    "RTOS内核",
+    "c_header"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:Core/User/rtos/myswitch.s",
+   "type": "file",
+   "name": "myswitch.s",
+   "filePath": "Core/User/rtos/myswitch.s",
+   "summary": "项目早期/备用版本的 PendSV_Handler 与 SVC_Handler 汇编实现，逻辑与 switch.s 相同：保存 R4-R11 到 TCB->sp、调 os_schedule、恢复新任务并切 PSP；SVC 用于启动首个任务。文件存在少量伪指令书写不规范（如缺少点号的 global）。",
+   "tags": [
+    "assembly",
+    "上下文切换",
+    "PendSV",
+    "SVC",
+    "Cortex-M4"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:Core/User/rtos/port.h",
+   "type": "file",
+   "name": "port.h",
+   "filePath": "Core/User/rtos/port.h",
+   "summary": "内核移植层头文件：定义临界区宏 KERNEL_BASEPRI=0x80，提供 enter_critical/exit_critical 内联函数（基于 BASEPRI 屏蔽），并封装 g_tick 读取接口 os_get_tick。",
+   "tags": [
+    "c_header",
+    "临界区",
+    "BASEPRI",
+    "移植层"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:Core/User/rtos/queue.c",
+   "type": "file",
+   "name": "queue.c",
+   "filePath": "Core/User/rtos/queue.c",
+   "summary": "消息队列同步原语：queue_init/queue_send/queue_recv 实现环形缓冲区，满/空时任务阻塞挂入 r_wait/w_wait 等待链表并 os_yield，唤醒对端等待者后置位 PENDSVSET 触发调度。",
+   "tags": [
+    "c",
+    "消息队列",
+    "同步原语",
+    "阻塞唤醒"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:Core/User/rtos/queue.h",
+   "type": "file",
+   "name": "queue.h",
+   "filePath": "Core/User/rtos/queue.h",
+   "summary": "消息队列接口头文件：定义 queue_t 结构（环形缓冲 buf/head/tail/count 与读写等待链表 r_wait/w_wait）及 queue_init/queue_send/queue_recv 原型。",
+   "tags": [
+    "c_header",
+    "消息队列",
+    "接口"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:Core/User/rtos/sem.c",
+   "type": "file",
+   "name": "sem.c",
+   "filePath": "Core/User/rtos/sem.c",
+   "summary": "信号量同步原语：sem_init/sem_take(P操作)/sem_give(V操作)。take 时无资源则阻塞挂等待链表（注释强调先 ready_remove 再挂队列的顺序关键），give 时优先唤醒队头等待者并触发 PendSV 调度。",
+   "tags": [
+    "c",
+    "信号量",
+    "P/V操作",
+    "阻塞唤醒"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:Core/User/rtos/sem.h",
+   "type": "file",
+   "name": "sem.h",
+   "filePath": "Core/User/rtos/sem.h",
+   "summary": "信号量接口头文件：定义 sem_t（资源计数 count + 等待任务链表头 wait_head）及 sem_init/sem_take/sem_give 原型。",
+   "tags": [
+    "c_header",
+    "信号量",
+    "接口"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "file:Core/User/rtos/switch.s",
+   "type": "file",
+   "name": "switch.s",
+   "filePath": "Core/User/rtos/switch.s",
+   "summary": "项目灵魂——上下文切换汇编：PendSV_Handler 保存 R4-R11 到 TCB->sp（任务跑 PSP、中断跑 MSP）、调用 os_schedule 选新任务并恢复现场；SVC_Handler 只做恢复下半场用于启动第一个任务（FreeRTOS 同款）。含详尽中文逐行注释。",
+   "tags": [
+    "assembly",
+    "上下文切换",
+    "PendSV",
+    "SVC",
+    "核心"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:Core/User/rtos/tcb.h",
+   "type": "file",
+   "name": "tcb.h",
+   "filePath": "Core/User/rtos/tcb.h",
+   "summary": "任务控制块头文件：定义 tcb_t（sp/prio/cur_prio/state/delay_ticks/slice/next/stack_base）、任务状态宏（FREE/READY/BLOCKED）、MAX_TASKS=5 与 2KB 栈大小，声明 tcb_pool 与 current_tcb。",
+   "tags": [
+    "c_header",
+    "TCB",
+    "任务管理"
+   ],
+   "complexity": "simple"
+  },
+  {
+   "id": "config:STM32F407xx_FLASH.ld",
+   "type": "config",
+   "name": "STM32F407xx_FLASH.ld",
+   "filePath": "STM32F407xx_FLASH.ld",
+   "summary": "STM32CubeMX 生成的链接脚本：定义 FLASH 1MB/RAM 128K/CCMRAM 64K 内存区域，入口 Reset_Handler，规划 .isr_vector/.text/.data/.bss 段布局并设定最小堆 0x200、栈 0x400。",
+   "tags": [
+    "linker_script",
+    "内存布局",
+    "CubeMX"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "config:TinyRTOS.ioc",
+   "type": "config",
+   "name": "TinyRTOS.ioc",
+   "filePath": "TinyRTOS.ioc",
+   "summary": "STM32CubeMX 工程配置（v6.18.0）：STM32F407VGT6 LQFP100，启用 NVIC/RCC/SYS/TIM2/USART1，时钟树 HCLK=168MHz，配置 PendSV/SVCall/SysTick 中断、PB8 按键、目标工具链 CMake。",
+   "tags": [
+    "ioc",
+    "CubeMX",
+    "时钟树",
+    "引脚配置"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "config:cmake/gcc-arm-none-eabi.cmake",
+   "type": "config",
+   "name": "gcc-arm-none-eabi.cmake",
+   "filePath": "cmake/gcc-arm-none-eabi.cmake",
+   "summary": "GNU ARM 工具链 CMake 工具链文件：arm-none-eabi-gcc，Cortex-M4 硬浮点 (-mfpu=fpv4-sp-d16 -mfloat-abi=hard)，链接 STM32F407xx_FLASH.ld，开启 --gc-sections 与 nano.specs。",
+   "tags": [
+    "cmake",
+    "工具链",
+    "GCC",
+    "交叉编译"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "config:cmake/starm-clang.cmake",
+   "type": "config",
+   "name": "starm-clang.cmake",
+   "filePath": "cmake/starm-clang.cmake",
+   "summary": "ST starm-clang (LLVM) 工具链 CMake 文件：Cortex-M4 硬浮点，支持 HYBRID/NEWLIB/PICOLIBC 三种库配置（默认 PICOLIBC），同样链接 STM32F407xx_FLASH.ld。",
+   "tags": [
+    "cmake",
+    "工具链",
+    "Clang",
+    "LLVM"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "config:cmake/stm32cubemx/CMakeLists.txt",
+   "type": "config",
+   "name": "CMakeLists.txt",
+   "filePath": "cmake/stm32cubemx/CMakeLists.txt",
+   "summary": "CubeMX 生成的 CMake 构建模块：定义宏（USE_HAL_DRIVER/STM32F407xx）、HAL 头文件路径，组织应用源文件与 STM32_Drivers 静态库（HAL TIM/UART/RCC/GPIO/DMA/PWR 等），组成 stm32cubemx 接口库。",
+   "tags": [
+    "cmake",
+    "构建系统",
+    "CubeMX",
+    "HAL"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "document:docs/SVC与PendSV_restore为何代码相同.md",
+   "type": "document",
+   "name": "SVC与PendSV_restore为何代码相同.md",
+   "filePath": "docs/SVC与PendSV_restore为何代码相同.md",
+   "summary": "设计文档：解释 SVC_Handler 与 PendSV_restore 恢复序列为何完全相同——本质都是\"从栈恢复任务+切PSP+异常返回\"；首任务启动是伪造一次中断返回（栈帧含 PC=入口函数），SVC 只做 PendSV 的下半场（无旧现场可存、无需调度），并分析 SVC 压入 MSP 的 8 字被永久丢弃的细节。",
+   "tags": [
+    "docs",
+    "设计解析",
+    "上下文切换",
+    "SVC",
+    "PendSV"
+   ],
+   "complexity": "moderate"
+  },
+  {
+   "id": "file:startup_stm32f407xx.s",
+   "type": "file",
+   "name": "startup_stm32f407xx.s",
+   "filePath": "startup_stm32f407xx.s",
+   "summary": "ST 官方启动文件（GCC 版）：定义 g_pfnVectors 向量表（含 PendSV/SVC/SysTick 等弱符号默认处理）、Reset_Handler（拷 .data、清 .bss、调 SystemInit、跳 main）及 Default_Handler 死循环。",
+   "tags": [
+    "assembly",
+    "启动代码",
+    "向量表",
+    "Reset_Handler"
+   ],
+   "complexity": "complex"
+  }
+ ],
+ "edges": [
+  {
+   "source": "config:.settings/bundles-lock.store.json",
+   "target": "config:.settings/bundles.store.json",
+   "type": "depends_on",
+   "weight": 1.0,
+   "direction": "forward"
+  },
+  {
+   "source": "config:.settings/bundles.store.json",
+   "target": "config:.settings/ide.store.json",
+   "type": "configures",
+   "weight": 0.5,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/main.c",
+   "target": "file:Core/Inc/main.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/main.c",
+   "target": "file:Core/Inc/usart.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/main.c",
+   "target": "file:Core/Inc/gpio.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/main.c",
+   "target": "file:Core/User/app/main_demo.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/gpio.c",
+   "target": "file:Core/Inc/gpio.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/gpio.c",
+   "target": "file:Core/Inc/main.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/usart.c",
+   "target": "file:Core/Inc/usart.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/usart.c",
+   "target": "file:Core/Inc/main.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/stm32f4xx_it.c",
+   "target": "file:Core/Inc/stm32f4xx_it.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/stm32f4xx_it.c",
+   "target": "file:Core/Inc/main.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/stm32f4xx_hal_msp.c",
+   "target": "file:Core/Inc/main.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/stm32f4xx_hal_timebase_tim.c",
+   "target": "file:Core/Inc/main.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/syscalls.c",
+   "target": "file:Core/Inc/main.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/sysmem.c",
+   "target": "file:Core/Inc/main.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/system_stm32f4xx.c",
+   "target": "file:Core/Inc/main.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/app/main_demo.c",
+   "target": "file:Core/User/app/main_demo.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/app/main_demo.c",
+   "target": "file:Core/User/rtos/kernel.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/app/main_demo.c",
+   "target": "file:Core/User/rtos/mutex.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/app/main_demo.c",
+   "target": "file:Core/Inc/main.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/app/main_demo.c",
+   "target": "file:Core/Inc/gpio.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/app/main_demo.h",
+   "target": "file:Core/User/rtos/kernel.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/kernel.c",
+   "target": "file:Core/User/rtos/kernel.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/kernel.c",
+   "target": "file:Core/User/rtos/port.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/kernel.h",
+   "target": "file:Core/User/rtos/tcb.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/mutex.c",
+   "target": "file:Core/User/rtos/mutex.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/mutex.c",
+   "target": "file:Core/User/rtos/kernel.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/mutex.c",
+   "target": "file:Core/User/rtos/port.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/mutex.h",
+   "target": "file:Core/User/rtos/tcb.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/main.c",
+   "target": "file:Core/User/app/main_demo.c",
+   "type": "calls",
+   "weight": 0.8,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/main.c",
+   "target": "file:Core/User/rtos/kernel.c",
+   "type": "calls",
+   "weight": 0.8,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/main.c",
+   "target": "file:Core/Src/gpio.c",
+   "type": "calls",
+   "weight": 0.8,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/main.c",
+   "target": "file:Core/Src/usart.c",
+   "type": "calls",
+   "weight": 0.8,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/main.c",
+   "target": "file:Core/Src/stm32f4xx_hal_timebase_tim.c",
+   "type": "calls",
+   "weight": 0.8,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/syscalls.c",
+   "target": "file:Core/Src/main.c",
+   "type": "depends_on",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/app/main_demo.c",
+   "target": "file:Core/User/rtos/kernel.c",
+   "type": "calls",
+   "weight": 0.8,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/app/main_demo.c",
+   "target": "file:Core/User/rtos/mutex.c",
+   "type": "calls",
+   "weight": 0.8,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/mutex.c",
+   "target": "file:Core/User/rtos/kernel.c",
+   "type": "depends_on",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/kernel.c",
+   "target": "file:Core/User/rtos/switch.s",
+   "type": "depends_on",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/stm32f4xx_hal_timebase_tim.c",
+   "target": "file:Core/Src/stm32f4xx_it.c",
+   "type": "calls",
+   "weight": 0.8,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/stm32f4xx_it.c",
+   "target": "file:Core/User/rtos/kernel.c",
+   "type": "depends_on",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/usart.c",
+   "target": "file:Core/Src/stm32f4xx_hal_msp.c",
+   "type": "depends_on",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/Src/system_stm32f4xx.c",
+   "target": "file:startup_stm32f407xx.s",
+   "type": "calls",
+   "weight": 0.8,
+   "direction": "forward"
+  },
+  {
+   "source": "config:CMakeLists.txt",
+   "target": "file:Core/Src/main.c",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:CMakeLists.txt",
+   "target": "file:Core/Src/gpio.c",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:CMakeLists.txt",
+   "target": "file:Core/Src/usart.c",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:CMakeLists.txt",
+   "target": "file:Core/Src/stm32f4xx_it.c",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:CMakeLists.txt",
+   "target": "file:Core/Src/stm32f4xx_hal_msp.c",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:CMakeLists.txt",
+   "target": "file:Core/Src/stm32f4xx_hal_timebase_tim.c",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:CMakeLists.txt",
+   "target": "file:Core/Src/syscalls.c",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:CMakeLists.txt",
+   "target": "file:Core/Src/sysmem.c",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:CMakeLists.txt",
+   "target": "file:Core/Src/system_stm32f4xx.c",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:CMakeLists.txt",
+   "target": "file:Core/User/rtos/kernel.c",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:CMakeLists.txt",
+   "target": "file:Core/User/rtos/mutex.c",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:CMakeLists.txt",
+   "target": "file:Core/User/rtos/sem.c",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:CMakeLists.txt",
+   "target": "file:Core/User/rtos/queue.c",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:CMakeLists.txt",
+   "target": "file:Core/User/rtos/switch.s",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:CMakeLists.txt",
+   "target": "file:Core/User/app/main_demo.c",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:CMakePresets.json",
+   "target": "config:CMakeLists.txt",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:.clangd",
+   "target": "config:CMakeLists.txt",
+   "type": "depends_on",
+   "weight": 0.5,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/kernel.c",
+   "target": "file:Core/User/rtos/tcb.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/queue.c",
+   "target": "file:Core/User/rtos/queue.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/queue.c",
+   "target": "file:Core/User/rtos/kernel.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/queue.c",
+   "target": "file:Core/User/rtos/port.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/queue.c",
+   "target": "file:Core/User/rtos/kernel.c",
+   "type": "calls",
+   "weight": 0.8,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/queue.c",
+   "target": "file:Core/User/rtos/switch.s",
+   "type": "calls",
+   "weight": 0.8,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/queue.h",
+   "target": "file:Core/User/rtos/tcb.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/sem.c",
+   "target": "file:Core/User/rtos/sem.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/sem.c",
+   "target": "file:Core/User/rtos/kernel.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/sem.c",
+   "target": "file:Core/User/rtos/port.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/sem.c",
+   "target": "file:Core/User/rtos/kernel.c",
+   "type": "calls",
+   "weight": 0.8,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/sem.c",
+   "target": "file:Core/User/rtos/switch.s",
+   "type": "calls",
+   "weight": 0.8,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/sem.h",
+   "target": "file:Core/User/rtos/tcb.h",
+   "type": "imports",
+   "weight": 0.7,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/port.h",
+   "target": "file:Core/User/rtos/kernel.c",
+   "type": "related",
+   "weight": 0.5,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/port.h",
+   "target": "file:Core/Src/stm32f4xx_it.c",
+   "type": "related",
+   "weight": 0.5,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/switch.s",
+   "target": "file:Core/User/rtos/kernel.c",
+   "type": "calls",
+   "weight": 0.8,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/switch.s",
+   "target": "file:Core/User/rtos/tcb.h",
+   "type": "related",
+   "weight": 0.5,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/switch.s",
+   "target": "file:startup_stm32f407xx.s",
+   "type": "related",
+   "weight": 0.5,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/myswitch.s",
+   "target": "file:Core/User/rtos/switch.s",
+   "type": "related",
+   "weight": 0.5,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/myswitch.s",
+   "target": "file:Core/User/rtos/kernel.c",
+   "type": "calls",
+   "weight": 0.8,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/myswitch.s",
+   "target": "file:startup_stm32f407xx.s",
+   "type": "related",
+   "weight": 0.5,
+   "direction": "forward"
+  },
+  {
+   "source": "file:Core/User/rtos/tcb.h",
+   "target": "file:Core/User/rtos/kernel.c",
+   "type": "related",
+   "weight": 0.5,
+   "direction": "forward"
+  },
+  {
+   "source": "config:cmake/gcc-arm-none-eabi.cmake",
+   "target": "config:STM32F407xx_FLASH.ld",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:cmake/starm-clang.cmake",
+   "target": "config:STM32F407xx_FLASH.ld",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:TinyRTOS.ioc",
+   "target": "file:Core/Src/main.c",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:TinyRTOS.ioc",
+   "target": "file:Core/Src/gpio.c",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:TinyRTOS.ioc",
+   "target": "file:Core/Src/usart.c",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:TinyRTOS.ioc",
+   "target": "file:Core/Src/stm32f4xx_it.c",
+   "type": "configures",
+   "weight": 0.6,
+   "direction": "forward"
+  },
+  {
+   "source": "config:cmake/stm32cubemx/CMakeLists.txt",
+   "target": "file:Core/Src/main.c",
+   "type": "contains",
+   "weight": 0.5,
+   "direction": "forward"
+  },
+  {
+   "source": "config:cmake/stm32cubemx/CMakeLists.txt",
+   "target": "file:Core/Src/gpio.c",
+   "type": "contains",
+   "weight": 0.5,
+   "direction": "forward"
+  },
+  {
+   "source": "config:cmake/stm32cubemx/CMakeLists.txt",
+   "target": "file:Core/Src/usart.c",
+   "type": "contains",
+   "weight": 0.5,
+   "direction": "forward"
+  },
+  {
+   "source": "config:cmake/stm32cubemx/CMakeLists.txt",
+   "target": "file:Core/Src/stm32f4xx_it.c",
+   "type": "contains",
+   "weight": 0.5,
+   "direction": "forward"
+  },
+  {
+   "source": "config:cmake/stm32cubemx/CMakeLists.txt",
+   "target": "file:Core/Src/sysmem.c",
+   "type": "contains",
+   "weight": 0.5,
+   "direction": "forward"
+  },
+  {
+   "source": "config:cmake/stm32cubemx/CMakeLists.txt",
+   "target": "file:Core/Src/syscalls.c",
+   "type": "contains",
+   "weight": 0.5,
+   "direction": "forward"
+  },
+  {
+   "source": "config:cmake/stm32cubemx/CMakeLists.txt",
+   "target": "file:Core/Src/system_stm32f4xx.c",
+   "type": "contains",
+   "weight": 0.5,
+   "direction": "forward"
+  },
+  {
+   "source": "config:cmake/stm32cubemx/CMakeLists.txt",
+   "target": "file:startup_stm32f407xx.s",
+   "type": "contains",
+   "weight": 0.5,
+   "direction": "forward"
+  },
+  {
+   "source": "document:docs/SVC与PendSV_restore为何代码相同.md",
+   "target": "file:Core/User/rtos/switch.s",
+   "type": "documents",
+   "weight": 0.5,
+   "direction": "forward"
+  },
+  {
+   "source": "document:docs/SVC与PendSV_restore为何代码相同.md",
+   "target": "file:Core/User/rtos/kernel.c",
+   "type": "documents",
+   "weight": 0.5,
+   "direction": "forward"
+  }
+ ],
+ "layers": [
+  {
+   "id": "layer:rtos-kernel",
+   "name": "RTOS 内核层",
+   "description": "手写实时内核核心：O(1) 位图调度器、任务管理（TCB）、Cortex-M4 PendSV/SVC 上下文切换汇编与移植层临界区。",
+   "nodeIds": [
+    "file:Core/User/rtos/kernel.c",
+    "file:Core/User/rtos/kernel.h",
+    "file:Core/User/rtos/tcb.h",
+    "file:Core/User/rtos/port.h",
+    "file:Core/User/rtos/switch.s",
+    "file:Core/User/rtos/myswitch.s"
+   ]
+  },
+  {
+   "id": "layer:rtos-sync",
+   "name": "同步原语层",
+   "description": "基于内核阻塞/唤醒机制实现的互斥量（含优先级继承）、信号量与消息队列。",
+   "nodeIds": [
+    "file:Core/User/rtos/mutex.c",
+    "file:Core/User/rtos/mutex.h",
+    "file:Core/User/rtos/sem.c",
+    "file:Core/User/rtos/sem.h",
+    "file:Core/User/rtos/queue.c",
+    "file:Core/User/rtos/queue.h"
+   ]
+  },
+  {
+   "id": "layer:application",
+   "name": "应用层",
+   "description": "程序入口与 RTOS 演示应用：main() 初始化外设后启动 app_init，演示优先级反转场景。",
+   "nodeIds": [
+    "file:Core/Src/main.c",
+    "file:Core/User/app/main_demo.c",
+    "file:Core/User/app/main_demo.h"
+   ]
+  },
+  {
+   "id": "layer:hal",
+   "name": "硬件抽象层（CubeMX/ST）",
+   "description": "CubeMX 生成与 ST 官方代码：外设初始化（GPIO/USART）、中断向量服务、HAL 时基、系统时钟、newlib 桩与启动文件。",
+   "nodeIds": [
+    "file:Core/Src/gpio.c",
+    "file:Core/Src/usart.c",
+    "file:Core/Src/stm32f4xx_it.c",
+    "file:Core/Src/stm32f4xx_hal_msp.c",
+    "file:Core/Src/stm32f4xx_hal_timebase_tim.c",
+    "file:Core/Src/syscalls.c",
+    "file:Core/Src/sysmem.c",
+    "file:Core/Src/system_stm32f4xx.c",
+    "file:startup_stm32f407xx.s",
+    "file:Core/Inc/main.h",
+    "file:Core/Inc/gpio.h",
+    "file:Core/Inc/usart.h",
+    "file:Core/Inc/stm32f4xx_it.h",
+    "file:Core/Inc/stm32f4xx_hal_conf.h"
+   ]
+  },
+  {
+   "id": "layer:build-config",
+   "name": "构建与工具链配置",
+   "description": "CMake 构建系统、双工具链（GCC/ARMCLang）配置、CubeMX .ioc 工程、链接脚本、IDE/clangd 元数据。",
+   "nodeIds": [
+    "config:CMakeLists.txt",
+    "config:CMakePresets.json",
+    "config:cmake/gcc-arm-none-eabi.cmake",
+    "config:cmake/starm-clang.cmake",
+    "config:cmake/stm32cubemx/CMakeLists.txt",
+    "config:TinyRTOS.ioc",
+    "config:.mxproject",
+    "config:STM32F407xx_FLASH.ld",
+    "config:.clangd",
+    "config:.settings/bundles-lock.store.json",
+    "config:.settings/bundles.store.json",
+    "config:.settings/ide.store.json",
+    "config:.ua/.understandignore"
+   ]
+  },
+  {
+   "id": "layer:docs",
+   "name": "设计文档",
+   "description": "内核设计解析文档：SVC 与 PendSV restore 序列代码相同的原理。",
+   "nodeIds": [
+    "document:docs/SVC与PendSV_restore为何代码相同.md"
+   ]
+  }
+ ],
+ "tour": [
+  {
+   "order": 1,
+   "title": "从这里开始：程序入口",
+   "description": "main.c 是所有代码的起点：HAL 初始化外设后调用 app_init()，随后进入 TinyRTOS 调度器接管的世界。",
+   "nodeIds": [
+    "file:Core/Src/main.c",
+    "file:Core/User/app/main_demo.h"
+   ]
+  },
+  {
+   "order": 2,
+   "title": "演示应用：优先级反转实验",
+   "description": "main_demo.c 用 taskL/taskH 复现经典优先级反转场景，直观展示为什么需要互斥量与优先级继承。",
+   "nodeIds": [
+    "file:Core/User/app/main_demo.c",
+    "file:Core/User/rtos/mutex.c",
+    "file:Core/User/rtos/mutex.h"
+   ]
+  },
+  {
+   "order": 3,
+   "title": "内核心脏：调度器与任务管理",
+   "description": "kernel.c 用位图+链表实现 O(1) 就绪队列，提供 task_create/task_delay/os_yield；tcb.h 定义任务控制块。",
+   "nodeIds": [
+    "file:Core/User/rtos/kernel.c",
+    "file:Core/User/rtos/kernel.h",
+    "file:Core/User/rtos/tcb.h"
+   ]
+  },
+  {
+   "order": 4,
+   "title": "上下文切换：PendSV/SVC 汇编",
+   "description": "switch.s 是全项目灵魂：PendSV_Handler 保存 R4-R11、切换 SP，SVC_Handler 触发首次调度。port.h 用 BASEPRI 实现临界区。",
+   "nodeIds": [
+    "file:Core/User/rtos/switch.s",
+    "file:Core/User/rtos/myswitch.s",
+    "file:Core/User/rtos/port.h",
+    "document:docs/SVC与PendSV_restore为何代码相同.md"
+   ]
+  },
+  {
+   "order": 5,
+   "title": "同步原语：信号量与消息队列",
+   "description": "sem.c/queue.c 复用内核的阻塞-唤醒机制实现 P/V 操作与环形缓冲，是任务间通信的基础设施。",
+   "nodeIds": [
+    "file:Core/User/rtos/sem.c",
+    "file:Core/User/rtos/queue.c"
+   ]
+  },
+  {
+   "order": 6,
+   "title": "硬件底座与构建",
+   "description": "中断向量在 stm32f4xx_it.c 与 startup 文件中定义，printf 经 usart.c/syscalls.c 重定向到串口；CMake + .ioc + 链接脚本完成交叉编译闭环。",
+   "nodeIds": [
+    "file:Core/Src/stm32f4xx_it.c",
+    "file:startup_stm32f407xx.s",
+    "file:Core/Src/usart.c",
+    "config:CMakeLists.txt",
+    "config:TinyRTOS.ioc",
+    "config:STM32F407xx_FLASH.ld"
+   ]
+  }
+ ]
+}
