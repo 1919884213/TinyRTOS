@@ -1,0 +1,40 @@
+name: Build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  firmware:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install ARM GNU toolchain + Ninja
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib ninja-build
+          arm-none-eabi-gcc --version | head -1
+
+      - name: Configure (Release)
+        run: cmake --preset Release
+
+      - name: Build
+        run: cmake --build --preset Release
+
+      - name: Show firmware size
+        run: |
+          arm-none-eabi-size build/Release/TinyRTOS.elf
+          cp build/Release/TinyRTOS.elf TinyRTOS.elf
+          cp build/Release/TinyRTOS.bin TinyRTOS.bin 2>/dev/null || true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: tinyrtos-firmware
+          path: |
+            TinyRTOS.elf
+            TinyRTOS.bin

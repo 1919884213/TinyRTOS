@@ -7,9 +7,10 @@
 `STM32F407VGT6` · `Cortex-M4` · `GCC / CMake` · `~700 行纯手写内核`
 
 [![MCU](https://img.shields.io/badge/MCU-STM32F407VGT6-orange?style=flat-square)](https://www.st.com/en/microcontrollers-microprocessors/stm32f407vg.html)
-[![Arch](https://img.shields.io/badge/Arch-ARM--Cortex--M4-blue?style=flat-square)](#上下文切换)
-[![Toolchain](https://img.shields.io/badge/Toolchain-arm--none--eabi-green?style=flat-square)](#构建)
-[![Build](https://img.shields.io/badge/Build-Passing-brightgreen?style=flat-square)](#构建)
+[![Arch](https://img.shields.io/badge/Arch-ARM--Cortex--M4-blue?style=flat-square)](#功能一览)
+[![Toolchain](https://img.shields.io/badge/Toolchain-arm--none--eabi-green?style=flat-square)](#快速上手)
+[![CI](https://img.shields.io/github/actions/workflow/status/1919884213/TinyRTOS/build.yml?label=CI&style=flat-square)](https://github.com/1919884213/TinyRTOS/actions/workflows/build.yml)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 [![Malloc](https://img.shields.io/badge/malloc-0-red?style=flat-square)](#设计亮点)
 
 </div>
@@ -104,14 +105,14 @@ Core/User/
 | `4` | 两任务竞争互斥锁 | 优先级继承生效 |
 | `5` | 任务删除与重建 | TCB 回收复用 |
 
-**2️⃣ 构建烧录**：
+**2️⃣ 构建烧录**：工具链需要 [arm-none-eabi-gcc](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain) + CMake ≥ 3.22 + Ninja（`arm-none-eabi-` 在 PATH 中）。仓库自带 CI workflow，每次 push 都在 Linux runner 上全量编译 Release：
 
 ```powershell
-cmake --preset Release        # 配置
+cmake --preset Release         # 配置
 cmake --build --preset Release # 产物: build/Release/TinyRTOS.elf / .bin
 ```
 
-调试版换 `Debug` 即可。串口输出走 USART1（波特率以 CubeMX 配置为准），复位后看打印。
+调试版换 `Debug`；烧录后串口输出走 USART1（波特率以 CubeMX 配置为准），复位看打印。
 
 **3️⃣ 写自己的任务**：入口签名 `void (*)(void *)`，跑 `os_start()` 前用 `task_create()` 注册：
 
@@ -165,4 +166,4 @@ void mutex_init(mutex_t *m);   void mutex_take(mutex_t *m);   void mutex_give(mu
 
 ## License
 
-学习项目，源码仅供参考交流。
+[MIT](LICENSE) — 随便用，注明出处即可。
