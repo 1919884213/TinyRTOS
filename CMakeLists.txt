@@ -50,7 +50,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Core/User/rtos/sem.c
     Core/User/rtos/queue.c
     Core/User/rtos/mutex.c
-    Core/User/app/main_demo.c
+    Core/User/app/os_examples.c
     Core/User/rtos/mutex.c
 )
 
