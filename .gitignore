@@ -1,6 +1,6 @@
 build
 mx.scratch
 !.settings
-.ua/.trash-*/
+.ua/
 .ua/tmp/
 IDEA.md
